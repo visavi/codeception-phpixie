@@ -1,0 +1,22 @@
+{
+    "name": "visavi/codeception-phpixie",
+    "description": "Phpixie module for Codeception",
+    "keywords": ["Codeception", "Phpixie"],
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Alexander Grigorev",
+            "email": "admin@visavi.net",
+            "homepage": "http://visavi.net"
+        }
+    ],
+    "require": {
+        "php": ">=7.1.0",
+        "codeception/codeception": "^2.4"
+    },
+    "autoload": {
+        "psr-4": {
+            "Codeception\\": "src"
+        }
+
+}
