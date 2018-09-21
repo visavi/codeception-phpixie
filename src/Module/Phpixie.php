@@ -2,6 +2,7 @@
 
 namespace Codeception\Module;
 
+use Codeception\Lib\Connector\Phpixie as PhpixieConnector;
 use Codeception\Lib\Framework;
 use Codeception\Lib\Interfaces\ActiveRecord;
 use Codeception\Lib\Interfaces\PartedModule;
@@ -9,11 +10,15 @@ use Codeception\TestInterface;
 
 class Phpixie extends Framework implements ActiveRecord, PartedModule
 {
+    public $app;
+
     public $orm;
 
     public $database;
 
     public $route;
+
+    public $client;
 
     /**
      * @var array
@@ -24,28 +29,32 @@ class Phpixie extends Framework implements ActiveRecord, PartedModule
 
     public function _initialize()
     {
-        $frameworkBuilder = new \Project\Framework\Builder();
-        $this->orm        = $frameworkBuilder->components()->orm();
-        $this->database   = $frameworkBuilder->components()->database();
-        $this->route      = $frameworkBuilder->components()->route();
+        $this->app     = new \Project\Framework();
+        $this->builder = new \Project\App\AppBuilder($this->app->builder());
+
+        $this->orm      = $this->app->builder()->components()->orm();
+        $this->database = $this->app->builder()->components()->database();
+        $this->route    = $this->app->builder()->components()->route();
     }
 
     /**
      * Before hook.
      *
-     * @param \Codeception\TestInterface $test
+     * @param TestInterface $test
      */
     public function _before(TestInterface $test)
     {
         if ($this->database && $this->config['cleanup']) {
             $this->database->get()->beginTransaction();
         }
+
+        $this->client = new PhpixieConnector($this);
     }
 
     /**
      * After hook.
      *
-     * @param \Codeception\TestInterface $test
+     * @param TestInterface $test
      */
     public function _after(TestInterface $test)
     {
@@ -74,21 +83,14 @@ class Phpixie extends Framework implements ActiveRecord, PartedModule
      */
     public function amOnRoute($routeName, $params = [])
     {
-        /*        var_dump(get_class_methods($this->route));  exit;
 
-                $route = $this->getRouteByName($routeName);
-
-                $absolute = !is_null($route->domain());
-                $url = $this->app['url']->route($routeName, $params, $absolute);
-                $this->amOnPage($url);*/
     }
-
 
     /**
      * Inserts record into the database.
      *
      * <?php
-     * $user = $I->haveRecord('user', array('name' => 'Davert'));
+     * $user = $I->haveRecord('user', ['name' => 'Davert']);
      * ?>
      *
      * @param string $entityName
@@ -105,15 +107,13 @@ class Phpixie extends Framework implements ActiveRecord, PartedModule
         }
 
         return $entity;
-
-
     }
 
     /**
      * Checks that record exists in database.
      *
      * <?php
-     * $I->seeRecord('user', array('name' => 'davert'));
+     * $I->seeRecord('user', ['name' => 'davert']);
      * ?>
      *
      * @param string $entityName
@@ -128,9 +128,6 @@ class Phpixie extends Framework implements ActiveRecord, PartedModule
 
         $this->assertTrue(true);
     }
-
-
-
 
 
     public function dontSeeRecord($model, $attributes = [])
@@ -163,5 +160,14 @@ class Phpixie extends Framework implements ActiveRecord, PartedModule
 
 
         return $query->findOne();
+    }
+
+    /**
+     * @param $routeName
+     * @return mixed
+     */
+    protected function getRouteByName($routeName)
+    {
+
     }
 }
