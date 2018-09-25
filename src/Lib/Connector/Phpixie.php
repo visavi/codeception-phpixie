@@ -2,7 +2,6 @@
 
 namespace Codeception\Lib\Connector;
 
-use PHPixie\HTTP\Messages\Message\Request\ServerRequest\SAPI;
 use Project\Framework;
 use Symfony\Component\BrowserKit\Client;
 use Symfony\Component\BrowserKit\Response;
@@ -21,8 +20,8 @@ class Phpixie extends Client
      */
     public function __construct($module)
     {
-        $framework    = new Framework();
-        $this->http   = $framework->builder()->components()->http();
+        $this->framework    = new Framework();
+        $this->http   = $this->framework->builder()->components()->http();
         $this->module = $module;
 
         $components = parse_url($this->module->config['url']);
@@ -55,20 +54,26 @@ class Phpixie extends Client
 
         $server += $request->getServer();
 
-        $serverRequest = new SAPI(
-            $this->http->messages(),
+        // тут все параметры uri
+        $sapiUri = $this->http->messages()->sapiUri($server);
+
+        $serverRequest = $this->http->messages()->sapiServerRequest(
             $server,
-            ['get'    => 1], // @TODO
-            ['post'   => 1], // @TODO
+            ['get'  => 1], // @TODO
+            ['post' => 1], // @TODO
             $request->getCookies(),
-            $request->getFiles(),
-            $request->getParameters()
+            $request->getFiles()
         );
 
-        $uri = $this->http->request($serverRequest)->serverRequest()->getUri();
-
-        return $this->http->messages()
+        $uri     = $this->http->request($serverRequest)->serverRequest()->getUri();
+        $content = $this->http->messages()
             ->stream($uri)
             ->getContents();
+
+        return new Response(
+            $content,
+            200,
+            []
+        );
     }
 }
