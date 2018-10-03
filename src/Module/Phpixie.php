@@ -11,16 +11,34 @@ use Project\Framework as ProjectFramework;
 
 class Phpixie extends Framework implements ActiveRecord, PartedModule
 {
-    public $framework;
+    /**
+     * @var \Project\Framework
+     */
+    protected $framework;
 
-    public $builder;
+    /**
+     * @var \Project\App\AppBuilder
+     */
+    protected $builder;
 
-    public $orm;
+    /**
+     * @var \PHPixie\ORM
+     */
+    protected $orm;
 
+    /**
+     * @var \PHPixie\Database
+     */
     public $database;
 
+    /**
+     * @var \PHPixie\Route
+     */
     public $route;
 
+    /**
+     * @var \Codeception\Lib\Connector\Phpixie
+     */
     public $client;
 
     /**

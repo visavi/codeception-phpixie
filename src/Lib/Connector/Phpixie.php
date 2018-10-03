@@ -9,8 +9,19 @@ use Symfony\Component\BrowserKit\Request as BrowserKitRequest;
 
 class Phpixie extends Client
 {
+    /**
+     * @var \Project\Framework
+     */
+    protected $framework;
+
+    /**
+     * @var \PHPixie\HTTP
+     */
     public $http;
 
+    /**
+     * @var \Codeception\Module\Phpixie
+     */
     public $module;
 
     /**
@@ -20,9 +31,9 @@ class Phpixie extends Client
      */
     public function __construct($module)
     {
-        $this->framework    = new Framework();
-        $this->http   = $this->framework->builder()->components()->http();
-        $this->module = $module;
+        $this->framework = new Framework();
+        $this->http      = $this->framework->builder()->components()->http();
+        $this->module    = $module;
 
         $components = parse_url($this->module->config['url']);
 
@@ -55,7 +66,7 @@ class Phpixie extends Client
         $server += $request->getServer();
 
         // тут все параметры uri
-        $sapiUri = $this->http->messages()->sapiUri($server);
+        //$sapiUri = $this->http->messages()->sapiUri($server);
 
         $serverRequest = $this->http->messages()->sapiServerRequest(
             $server,
