@@ -7,10 +7,13 @@ use Codeception\Lib\Framework;
 use Codeception\Lib\Interfaces\ActiveRecord;
 use Codeception\Lib\Interfaces\PartedModule;
 use Codeception\TestInterface;
+use Project\Framework as ProjectFramework;
 
 class Phpixie extends Framework implements ActiveRecord, PartedModule
 {
-    public $app;
+    public $framework;
+
+    public $builder;
 
     public $orm;
 
@@ -29,12 +32,11 @@ class Phpixie extends Framework implements ActiveRecord, PartedModule
 
     public function _initialize()
     {
-        $this->app     = new \Project\Framework();
-        $this->builder = new \Project\App\AppBuilder($this->app->builder());
-
-        $this->orm      = $this->app->builder()->components()->orm();
-        $this->database = $this->app->builder()->components()->database();
-        $this->route    = $this->app->builder()->components()->route();
+        $this->framework = new ProjectFramework();
+        $this->builder   = $this->framework->builder();
+        $this->orm       = $this->builder->components()->orm();
+        $this->database  = $this->builder->components()->database();
+        $this->route     = $this->builder->components()->route();
     }
 
     /**
@@ -129,17 +131,55 @@ class Phpixie extends Framework implements ActiveRecord, PartedModule
         $this->assertTrue(true);
     }
 
-
-    public function dontSeeRecord($model, $attributes = [])
+    /**
+     * Checks that record does not exist in database.
+     *
+     * ``` php
+     * <?php
+     * $I->dontSeeRecord('user', ['name' => 'davert']);
+     * ?>
+     * ```
+     *
+     * @param string $entityName
+     * @param array $attributes
+     * @part orm
+     */
+    public function dontSeeRecord($entityName, $attributes = [])
     {
+        if ($this->findRecord($entityName, $attributes)) {
+            $this->fail("Unexpectedly found matching record in entity '$entityName'");
+        }
 
+        $this->assertTrue(true);
     }
 
-    public function grabRecord($model, $attributes = [])
-    {
 
+    /**
+     * Retrieves record from database.
+     *
+     * ``` php
+     * <?php
+     * $record = $I->grabRecord('user', ['name' => 'davert']);
+     * ?>
+     * ```
+     *
+     * @param string $entityName
+     * @param array $attributes
+     * @return Entity
+     * @part orm
+     */
+    public function grabRecord($entityName, $attributes = [])
+    {
+        if (! $record = $this->findRecord($entityName, $attributes)) {
+            $this->fail("Could not find matching record in entity '$entityName'");
+        }
+
+        return $record;
     }
 
+    /**
+     * @return array
+     */
     public function _parts()
     {
         return ['orm'];
