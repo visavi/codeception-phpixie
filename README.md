@@ -42,24 +42,24 @@ All methods work in a transaction, which means that after the tests are complete
 ##### Inserts record into the database
 
 ```php
-$user = $I->haveRecord('user', ['name' => 'Davert']);
+$user = $I->haveRecord('user', ['name' => 'phpixie']);
 ```
 ##### Checks that record exists in database.
 
 ```php
-$I->seeRecord('user', ['name' => 'davert']);
+$I->seeRecord('user', ['name' => 'phpixie']);
 ```
 
 ##### Checks that record does not exist in database.
 
 ```php
-$I->dontSeeRecord('user', ['name' => 'davert']);
+$I->dontSeeRecord('user', ['name' => 'trixie']);
 ```
 
 ##### Retrieves record from database.
 
 ```php
-$record = $I->grabRecord('user', ['name' => 'davert']);
+$record = $I->grabRecord('user', ['name' => 'phpixie']);
 ```
 
 ### Example

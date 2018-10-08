@@ -7,6 +7,9 @@ use Codeception\Lib\Framework;
 use Codeception\Lib\Interfaces\ActiveRecord;
 use Codeception\Lib\Interfaces\PartedModule;
 use Codeception\TestInterface;
+use PHPixie\Database\Exception\Driver;
+use PHPixie\ORM\Exception\Query;
+use PHPixie\ORM\Models\Type\Database\Implementation\Entity;
 use Project\Framework as ProjectFramework;
 
 class Phpixie extends Framework implements ActiveRecord, PartedModule
@@ -61,6 +64,7 @@ class Phpixie extends Framework implements ActiveRecord, PartedModule
      * Before hook.
      *
      * @param TestInterface $test
+     * @throws Driver
      */
     public function _before(TestInterface $test)
     {
@@ -75,6 +79,7 @@ class Phpixie extends Framework implements ActiveRecord, PartedModule
      * After hook.
      *
      * @param TestInterface $test
+     * @throws Driver
      */
     public function _after(TestInterface $test)
     {
@@ -110,7 +115,7 @@ class Phpixie extends Framework implements ActiveRecord, PartedModule
      * Inserts record into the database.
      *
      * <?php
-     * $user = $I->haveRecord('user', ['name' => 'Davert']);
+     * $user = $I->haveRecord('user', ['name' => 'Phpixie']);
      * ?>
      *
      * @param string $entityName
@@ -133,11 +138,12 @@ class Phpixie extends Framework implements ActiveRecord, PartedModule
      * Checks that record exists in database.
      *
      * <?php
-     * $I->seeRecord('user', ['name' => 'davert']);
+     * $I->seeRecord('user', ['name' => 'Phpixie']);
      * ?>
      *
      * @param string $entityName
-     * @param array $attributes
+     * @param array  $attributes
+     * @throws Query
      * @part orm
      */
     public function seeRecord($entityName, $attributes = [])
@@ -154,12 +160,13 @@ class Phpixie extends Framework implements ActiveRecord, PartedModule
      *
      * ``` php
      * <?php
-     * $I->dontSeeRecord('user', ['name' => 'davert']);
+     * $I->dontSeeRecord('user', ['name' => 'Trixie']);
      * ?>
      * ```
      *
      * @param string $entityName
-     * @param array $attributes
+     * @param array  $attributes
+     * @throws Query
      * @part orm
      */
     public function dontSeeRecord($entityName, $attributes = [])
@@ -171,19 +178,19 @@ class Phpixie extends Framework implements ActiveRecord, PartedModule
         $this->assertTrue(true);
     }
 
-
     /**
      * Retrieves record from database.
      *
      * ``` php
      * <?php
-     * $record = $I->grabRecord('user', ['name' => 'davert']);
+     * $record = $I->grabRecord('user', ['name' => 'Phpixie']);
      * ?>
      * ```
      *
      * @param string $entityName
-     * @param array $attributes
-     * @return Entity
+     * @param array  $attributes
+     * @return $entityName
+     * @throws Query
      * @part orm
      */
     public function grabRecord($entityName, $attributes = [])
@@ -205,8 +212,9 @@ class Phpixie extends Framework implements ActiveRecord, PartedModule
 
     /**
      * @param string $table
-     * @param array $attributes
-     * @return array
+     * @param array  $attributes
+     * @return null|Entity
+     * @throws Query
      */
     protected function findRecord($entityName, $attributes = [])
     {
