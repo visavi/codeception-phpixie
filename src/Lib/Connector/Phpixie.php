@@ -17,12 +17,12 @@ class Phpixie extends Client
     /**
      * @var \PHPixie\HTTP
      */
-    public $http;
+    protected $http;
 
     /**
      * @var \Codeception\Module\Phpixie
      */
-    public $module;
+    protected $module;
 
     /**
      * Constructor.
@@ -32,8 +32,7 @@ class Phpixie extends Client
     public function __construct($module)
     {
         $this->framework = new Framework();
-        $this->builder   = new \Project\App\AppBuilder($this->framework->builder());
-        $this->http      = $this->builder->components()->http();
+        $this->http      = $this->framework->builder()->components()->http();
         $this->module    = $module;
 
         $components = parse_url($this->module->config['url']);
@@ -55,6 +54,7 @@ class Phpixie extends Client
     {
         $uri         = $request->getUri();
         $server      = $request->getServer();
+        $method      = $request->getMethod();
         $pathString  = parse_url($uri, PHP_URL_PATH);
         $queryString = parse_url($uri, PHP_URL_QUERY);
 
@@ -62,9 +62,10 @@ class Phpixie extends Client
         $_FILES  = $request->getFiles();
 
         $_SERVER = [
-            'REQUEST_METHOD' => $request->getMethod(),
-            'REQUEST_URI'    => $pathString . $queryString,
-            'HTTPS'          => $server['HTTPS'] ? 'on' : 'off',
+            'SERVER_PROTOCOL' => 'HTTP/1.1',
+            'REQUEST_METHOD'  => $method,
+            'REQUEST_URI'     => $pathString . $queryString,
+            'HTTPS'           => $server['HTTPS'] ? 'on' : 'off',
         ];
 
         $_SERVER += $server;
@@ -72,10 +73,10 @@ class Phpixie extends Client
         $uri = $this->http->messages()->sapiUri($_SERVER);
 
         $serverRequest = $this->http->messages()->serverRequest(
-            'HTTP/1.1',
+            $_SERVER['SERVER_PROTOCOL'],
             $_SERVER,
             '',
-            $request->getMethod(),
+            $method,
             $uri,
             $_SERVER,
             $queryString,
