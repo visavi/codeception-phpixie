@@ -10,7 +10,7 @@ composer require visavi/codeception-phpixie
 ### Settings
 
 Include the phpixie module in the `tests/functional.suite` file
-```
+```yaml
 actor: FunctionalTester
 modules:
     enabled:
@@ -22,7 +22,7 @@ modules:
 In acceptance tests, you can use methods to work with a database of functional tests.
 
 To do this, you must enable the module in the `tests/acceptance.suite` file
-```
+```yaml
 actor: AcceptanceTester
 modules:
     enabled:
@@ -64,7 +64,7 @@ $record = $I->grabRecord('user', ['name' => 'davert']);
 
 ### Example
 
-```
+```php
 $data = [
     'login'    => 'phpixie',
     'password' => 'password',
