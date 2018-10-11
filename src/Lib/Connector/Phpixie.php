@@ -3,6 +3,7 @@
 namespace Codeception\Lib\Connector;
 
 use Project\Framework;
+use PHPixie\HTTP;
 use Symfony\Component\BrowserKit\Client;
 use Symfony\Component\BrowserKit\Response;
 use Symfony\Component\BrowserKit\Request as BrowserKitRequest;
@@ -10,12 +11,12 @@ use Symfony\Component\BrowserKit\Request as BrowserKitRequest;
 class Phpixie extends Client
 {
     /**
-     * @var \Project\Framework
+     * @var Framework
      */
     protected $framework;
 
     /**
-     * @var \PHPixie\HTTP
+     * @var HTTP
      */
     protected $http;
 
@@ -32,10 +33,24 @@ class Phpixie extends Client
     public function __construct($module)
     {
         $this->framework = new Framework();
-        $this->http      = $this->framework->builder()->components()->http();
+        $this->builder   = $this->framework->builder();
+        $this->http      = $this->builder->components()->http();
         $this->module    = $module;
 
-        $components = parse_url($this->module->config['url']);
+        $baseHost = $this->builder
+            ->configuration()
+            ->httpConfig()
+            ->get('translator.baseHost', 'http://localhost');
+
+        if (strpos($baseHost, '//') === false) {
+            $baseHost = '//' . $baseHost;
+        }
+
+        $components = parse_url($baseHost);
+
+        if (array_key_exists('url', $this->module->config)) {
+            $components = parse_url($this->module->config['url']);
+        }
 
         $server = [
             'HTTP_HOST' => $components['host'],
