@@ -33,7 +33,7 @@ modules:
         - \Helper\Acceptance
 ```
 
-After that 4 methods will be available to work with the database.
+After that 5 methods will be available to work with the database.
 
 ### Methods for working with the DB
 
@@ -60,6 +60,12 @@ $I->dontSeeRecord('user', ['name' => 'trixie']);
 
 ```php
 $record = $I->grabRecord('user', ['name' => 'phpixie']);
+```
+
+##### Removes a record from the database.
+
+```php
+$I->deleteRecord('user', ['id' => $user->id]);
 ```
 
 ### Example
