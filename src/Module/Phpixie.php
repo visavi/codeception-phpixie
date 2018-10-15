@@ -7,6 +7,7 @@ use Codeception\Lib\Framework;
 use Codeception\Lib\Interfaces\ActiveRecord;
 use Codeception\Lib\Interfaces\PartedModule;
 use Codeception\TestInterface;
+use PHPixie\Database\Exception\Driver;
 use PHPixie\ORM\Exception\Query;
 use PHPixie\ORM\Models\Type\Database\Implementation\Entity;
 use Project\Framework as ProjectFramework;
@@ -77,7 +78,7 @@ class Phpixie extends Framework implements ActiveRecord, PartedModule
      * After hook.
      *
      * @param TestInterface $test
-     * @throws \PHPixie\Database\Exception\Driver
+     * @throws Driver
      */
     public function _after(TestInterface $test)
     {
@@ -116,8 +117,8 @@ class Phpixie extends Framework implements ActiveRecord, PartedModule
      *
      * @param string $entityName
      * @param array  $attributes
-     * @part orm
      * @return Entity
+     * @part orm
      */
     public function haveRecord($entityName, $attributes = [])
     {
