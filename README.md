@@ -33,7 +33,7 @@ modules:
         - \Helper\Acceptance
 ```
 
-After that 5 methods will be available to work with the database.
+After that 7 methods will be available to work with the database.
 
 ### Methods for working with the DB
 
@@ -66,6 +66,31 @@ $record = $I->grabRecord('user', ['name' => 'phpixie']);
 
 ```php
 $I->deleteRecord('user', ['id' => $user->id]);
+```
+
+Transaction control methods do not look at the global transaction enable settings, if you have transactions enabled by default, you can turn them off for each method
+
+Conversely, if transactions are globally disabled (cleanup: false), then methods can force transactions to be enabled.
+
+```php
+$I->startTransaction();
+```
+
+```php
+$I->stopTransaction();
+```
+
+### Call methods
+
+Calling methods for functional and acceptance tests:
+
+ ```
+$I->methodName();
+```
+
+Calling methods for unit tests:
+ ```
+$this->tester->methodName();
 ```
 
 ### Example
