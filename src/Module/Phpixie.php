@@ -67,8 +67,8 @@ class Phpixie extends Framework implements ActiveRecord, PartedModule
      */
     public function _before(TestInterface $test)
     {
-        if ($this->database && $this->config['cleanup']) {
-            $this->database->get()->beginTransaction();
+        if ($this->config['cleanup']) {
+            $this->startTransaction();
         }
 
         $this->client = new PhpixieConnector($this);
@@ -82,15 +82,37 @@ class Phpixie extends Framework implements ActiveRecord, PartedModule
      */
     public function _after(TestInterface $test)
     {
-        if ($this->database && $this->config['cleanup']) {
-            $this->database->get()->rollbackTransaction();
-        }
+        $this->stopTransaction();
 
         if ($this->database) {
             $this->database->get()->disconnect();
         }
 
         parent::_after($test);
+    }
+
+    /**
+     * Starts a transaction
+     *
+     * @part orm
+     */
+    public function startTransaction()
+    {
+        if ($this->database) {
+            $this->database->get()->beginTransaction();
+        }
+    }
+
+    /**
+     * Stops the transaction
+     *
+     * @part orm
+     */
+    public function stopTransaction()
+    {
+        if ($this->database && $this->database->get()->inTransaction()) {
+            $this->database->get()->rollbackTransaction();
+        }
     }
 
     /**
