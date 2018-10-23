@@ -10,6 +10,8 @@ use Symfony\Component\BrowserKit\Request as BrowserKitRequest;
 
 class Phpixie extends Client
 {
+    use Shared\PhpSuperGlobalsConverter;
+
     /**
      * @var Framework
      */
@@ -73,8 +75,16 @@ class Phpixie extends Client
         $pathString  = parse_url($uri, PHP_URL_PATH);
         $queryString = parse_url($uri, PHP_URL_QUERY);
 
-        $_COOKIE = $request->getCookies();
-        $_FILES  = $request->getFiles();
+        $_COOKIE  = $request->getCookies();
+        $_FILES   = $this->remapFiles($request->getFiles());
+        $_REQUEST = $this->remapRequestParameters($request->getParameters());
+        $_POST    = $_GET = [];
+
+        if (strtoupper($method) === 'GET') {
+            $_GET = $_REQUEST;
+        } else {
+            $_POST = $_REQUEST;
+        }
 
         $_SERVER = [
             'SERVER_PROTOCOL' => 'HTTP/1.1',
@@ -90,7 +100,7 @@ class Phpixie extends Client
         $serverRequest = $this->http->messages()->serverRequest(
             $_SERVER['SERVER_PROTOCOL'],
             $_SERVER,
-            '',
+            $_POST,
             $method,
             $uri,
             $_SERVER,
